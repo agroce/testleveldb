@@ -21,8 +21,8 @@ int rmrf(const char *path) {
 
 #define TEST_LENGTH 10
 
-#define MAX_KEY_LENGTH 10
-#define MAX_VALUE_LENGTH 10
+#define MAX_KEY_LENGTH 256
+#define MAX_VALUE_LENGTH 256
 
 TEST(LevelDB, Fuzz) {
   leveldb::DB* db;
@@ -34,17 +34,22 @@ TEST(LevelDB, Fuzz) {
   for (int n=0; n < TEST_LENGTH; n++) {
     OneOf(
 	  [&] {
-	    char* key = DeepState_CStr(MAX_KEY_LENGTH);
-	    char* value = DeepState_CStr(MAX_VALUE_LENGTH);
+	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
+	    char* value = DeepState_CStrUpToLen(MAX_VALUE_LENGTH);
 	    LOG(TRACE) << n << ": PUT " << key << " " << value;
-	    leveldb::Status s = db->Put(leveldb::WriteOptions(), key, value);
+	    leveldb::WriteOptions write_options;
+	    if (DeepState_Bool()) {
+	      write_options.sync = true;	    
+	      LOG(TRACE) << n << ": sync = true";
+	    }
+	    leveldb::Status s = db->Put(write_options, key, value);
 	    if (!s.ok()) {
 	      LOG(TRACE) << n << ": NOT OK: " << s.ToString();
 	    }
 	  },
 	  [&] {
 	    std::string value;
-	    char* key = DeepState_CStr(MAX_KEY_LENGTH);
+	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
 	    LOG(TRACE) << n << ": GET " << key;
 	    leveldb::Status s = db->Get(leveldb::ReadOptions(), key, &value);
 	    if (s.ok()) {
@@ -52,7 +57,20 @@ TEST(LevelDB, Fuzz) {
 	    } else {
 	      LOG(TRACE) << n << ": NOT OK: " <<s.ToString();
 	    }
-	  }
+	  },
+	  [&] {
+	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
+	    LOG(TRACE) << n << ": DELETE " << key;
+	    leveldb::WriteOptions write_options;
+	    if (DeepState_Bool()) {
+	      write_options.sync = true;	    
+	      LOG(TRACE) << n << ": sync = true";
+	    }	    
+	    leveldb::Status s = db->Delete(write_options, key);
+	    if (!s.ok()) {
+	      LOG(TRACE) << n << ": NOT OK: " << s.ToString();
+	    }
+	  }	  
 	  );
   }
   
