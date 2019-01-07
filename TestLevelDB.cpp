@@ -19,7 +19,7 @@ int rmrf(const char *path) {
 
 #define DATABASE_LOCATION "/Volumes/ramdisk/testdb"
 
-#define TEST_LENGTH 10
+#define TEST_LENGTH 20
 
 #define MAX_KEY_LENGTH 64
 #define MAX_VALUE_LENGTH 64
