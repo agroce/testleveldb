@@ -19,7 +19,8 @@ int rmrf(const char *path) {
   return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
 }
 
-#define DATABASE_LOCATION "/tmp/testdb"
+#define LEVELDB_LOCATION "/tmp/testleveldb"
+#define ROCKSDB_LOCATION "/tmp/testrocksdb"
 
 #define TEST_LENGTH 20
 
@@ -31,7 +32,13 @@ TEST(LevelDB, Fuzz) {
   leveldb::Options options;
   options.create_if_missing = true;
   leveldb::Status status = leveldb::DB::Open(options, DATABASE_LOCATION, &db);
-  ASSERT(status.ok()) << "Could not create the test database!";
+  ASSERT(status.ok()) << "Could not create the leveldb test database!";
+
+  rocksdb::DB* db;
+  rocksdb::Options options;
+  options.create_if_missing = true;
+  rocksdb::Status status = rocksdb::DB::Open(options, DATABASE_LOCATION, &db);
+  ASSERT(status.ok()) << "Could not create the rocksdb test database!";  
 
   leveldb::WriteBatch batch;
   
@@ -101,5 +108,6 @@ TEST(LevelDB, Fuzz) {
   }
   
   delete db;
-  rmrf(DATABASE_LOCATION);
+  rmrf(LEVELDB_LOCATION);
+  rmrf(ROCKSDB_LOCATION);
 }
