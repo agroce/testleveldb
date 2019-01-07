@@ -1,5 +1,7 @@
 #include "leveldb/db.h"
 #include "leveldb/write_batch.h"
+#include "rocksdb/db.h"
+#include "rocksdb/write_batch.h"
 #include "ftw.h"
 
 #include <deepstate/DeepState.hpp>
@@ -17,7 +19,7 @@ int rmrf(const char *path) {
   return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
 }
 
-#define DATABASE_LOCATION "/Volumes/ramdisk/testdb"
+#define DATABASE_LOCATION "/tmp/testdb"
 
 #define TEST_LENGTH 20
 
