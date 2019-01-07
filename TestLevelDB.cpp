@@ -1,5 +1,5 @@
-#include <cassert>
 #include "leveldb/db.h"
+#include "leveldb/write_batch.h"
 #include "ftw.h"
 
 #include <deepstate/DeepState.hpp>
@@ -21,8 +21,8 @@ int rmrf(const char *path) {
 
 #define TEST_LENGTH 10
 
-#define MAX_KEY_LENGTH 256
-#define MAX_VALUE_LENGTH 256
+#define MAX_KEY_LENGTH 64
+#define MAX_VALUE_LENGTH 64
 
 TEST(LevelDB, Fuzz) {
   leveldb::DB* db;
@@ -31,6 +31,8 @@ TEST(LevelDB, Fuzz) {
   leveldb::Status status = leveldb::DB::Open(options, DATABASE_LOCATION, &db);
   ASSERT(status.ok()) << "Could not create the test database!";
 
+  leveldb::WriteBatch batch;
+  
   for (int n=0; n < TEST_LENGTH; n++) {
     OneOf(
 	  [&] {
@@ -47,6 +49,12 @@ TEST(LevelDB, Fuzz) {
 	      LOG(TRACE) << n << ": NOT OK: " << s.ToString();
 	    }
 	  },
+	  [&] {
+	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
+	    char* value = DeepState_CStrUpToLen(MAX_VALUE_LENGTH);
+	    LOG(TRACE) << n << ": BATCH PUT " << key << " " << value;
+	    batch.Put(key, value);
+	  },	  
 	  [&] {
 	    std::string value;
 	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
@@ -70,7 +78,23 @@ TEST(LevelDB, Fuzz) {
 	    if (!s.ok()) {
 	      LOG(TRACE) << n << ": NOT OK: " << s.ToString();
 	    }
-	  }	  
+	  },
+	  [&] {
+	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
+	    LOG(TRACE) << n << ": BATCH DELETE " << key;
+	    batch.Delete(key);
+	  },	  
+	  [&] {
+	    LOG(TRACE) << n << ": BATCH WRITE";
+	    leveldb::Status s = db->Write(leveldb::WriteOptions(), &batch);
+	    if (!s.ok()) {
+	      LOG(TRACE) << n << ": NOT OK: " << s.ToString();
+	    }	    
+	  },
+	  [&] {
+	    LOG(TRACE) << n << ": BATCH CLEAR";	    
+	    batch.Clear();
+	  }
 	  );
   }
   
