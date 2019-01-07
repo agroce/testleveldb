@@ -30,13 +30,13 @@ int rmrf(const char *path) {
 TEST(LevelDB, Fuzz) {
   leveldb::DB* l_db;
   leveldb::Options l_options;
-  options.create_if_missing = true;
+  l_options.create_if_missing = true;
   leveldb::Status l_status = leveldb::DB::Open(l_options, LEVELDB_LOCATION, &l_db);
   ASSERT(l_status.ok()) << "Could not create the leveldb test database!";
 
   rocksdb::DB* r_db;
   rocksdb::Options r_options;
-  options.create_if_missing = true;
+  r_options.create_if_missing = true;
   rocksdb::Status r_status = rocksdb::DB::Open(r_options, ROCKSDB_LOCATION, &r_db);
   ASSERT(r_status.ok()) << "Could not create the rocksdb test database!";  
 
