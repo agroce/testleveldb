@@ -53,7 +53,7 @@ TEST(LevelDB, Fuzz) {
 	      write_options.sync = true;	    
 	      LOG(TRACE) << n << ": sync = true";
 	    }
-	    leveldb::Status s = db->Put(write_options, key, value);
+	    leveldb::Status s = l_db->Put(write_options, key, value);
 	    if (!s.ok()) {
 	      LOG(TRACE) << n << ": NOT OK: " << s.ToString();
 	    }
@@ -68,7 +68,7 @@ TEST(LevelDB, Fuzz) {
 	    std::string value;
 	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
 	    LOG(TRACE) << n << ": GET " << key;
-	    leveldb::Status s = db->Get(leveldb::ReadOptions(), key, &value);
+	    leveldb::Status s = l_db->Get(leveldb::ReadOptions(), key, &value);
 	    if (s.ok()) {
 	      LOG(TRACE) << n << ": RESULT:" << value;
 	    } else {
@@ -83,7 +83,7 @@ TEST(LevelDB, Fuzz) {
 	      write_options.sync = true;	    
 	      LOG(TRACE) << n << ": sync = true";
 	    }	    
-	    leveldb::Status s = db->Delete(write_options, key);
+	    leveldb::Status s = l_db->Delete(write_options, key);
 	    if (!s.ok()) {
 	      LOG(TRACE) << n << ": NOT OK: " << s.ToString();
 	    }
@@ -95,7 +95,7 @@ TEST(LevelDB, Fuzz) {
 	  },	  
 	  [&] {
 	    LOG(TRACE) << n << ": BATCH WRITE";
-	    leveldb::Status s = db->Write(leveldb::WriteOptions(), &batch);
+	    leveldb::Status s = l_db->Write(leveldb::WriteOptions(), &batch);
 	    if (!s.ok()) {
 	      LOG(TRACE) << n << ": NOT OK: " << s.ToString();
 	    }	    
@@ -107,7 +107,8 @@ TEST(LevelDB, Fuzz) {
 	  );
   }
   
-  delete db;
+  delete l_db;
+  delete r_db;
   rmrf(LEVELDB_LOCATION);
   rmrf(ROCKSDB_LOCATION);
 }
