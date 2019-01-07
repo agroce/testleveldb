@@ -28,17 +28,17 @@ int rmrf(const char *path) {
 #define MAX_VALUE_LENGTH 64
 
 TEST(LevelDB, Fuzz) {
-  leveldb::DB* db;
-  leveldb::Options options;
+  leveldb::DB* l_db;
+  leveldb::Options l_options;
   options.create_if_missing = true;
-  leveldb::Status status = leveldb::DB::Open(options, DATABASE_LOCATION, &db);
-  ASSERT(status.ok()) << "Could not create the leveldb test database!";
+  leveldb::Status l_status = leveldb::DB::Open(l_options, LEVELDB_LOCATION, &l_db);
+  ASSERT(l_status.ok()) << "Could not create the leveldb test database!";
 
-  rocksdb::DB* db;
-  rocksdb::Options options;
+  rocksdb::DB* r_db;
+  rocksdb::Options r_options;
   options.create_if_missing = true;
-  rocksdb::Status status = rocksdb::DB::Open(options, DATABASE_LOCATION, &db);
-  ASSERT(status.ok()) << "Could not create the rocksdb test database!";  
+  rocksdb::Status r_status = rocksdb::DB::Open(r_options, ROCKSDB_LOCATION, &r_db);
+  ASSERT(r_status.ok()) << "Could not create the rocksdb test database!";  
 
   leveldb::WriteBatch batch;
   
