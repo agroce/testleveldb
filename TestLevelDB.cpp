@@ -1,8 +1,12 @@
 #include "leveldb/db.h"
 #include "leveldb/write_batch.h"
+
+#ifdef ROCKS_TOO
 #include "rocksdb/db.h"
 #include "rocksdb/options.h"
 #include "rocksdb/write_batch.h"
+#endif
+
 #include "ftw.h"
 
 #include <deepstate/DeepState.hpp>
@@ -35,11 +39,13 @@ TEST(LevelDB, Fuzz) {
   leveldb::Status l_status = leveldb::DB::Open(l_options, LEVELDB_LOCATION, &l_db);
   ASSERT(l_status.ok()) << "Could not create the leveldb test database!";
 
+#ifdef ROCKS_TOO
   rocksdb::DB* r_db;
   rocksdb::Options r_options;
   r_options.create_if_missing = true;
   rocksdb::Status r_status = rocksdb::DB::Open(r_options, ROCKSDB_LOCATION, &r_db);
-  ASSERT(r_status.ok()) << "Could not create the rocksdb test database!";  
+  ASSERT(r_status.ok()) << "Could not create the rocksdb test database!";
+#endif
 
   leveldb::WriteBatch batch;
   
@@ -109,7 +115,10 @@ TEST(LevelDB, Fuzz) {
   }
   
   delete l_db;
-  delete r_db;
   rmrf(LEVELDB_LOCATION);
+
+#ifdef ROCKS_TOO
+  delete r_db;
   rmrf(ROCKSDB_LOCATION);
+#endif
 }
