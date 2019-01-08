@@ -1,12 +1,6 @@
 #include "leveldb/db.h"
 #include "leveldb/write_batch.h"
 
-#ifdef ROCKS_TOO
-#include "rocksdb/db.h"
-#include "rocksdb/options.h"
-#include "rocksdb/write_batch.h"
-#endif
-
 #include "ftw.h"
 
 #include <deepstate/DeepState.hpp>
@@ -33,26 +27,15 @@ int rmrf(const char *path) {
 #define MAX_VALUE_LENGTH 64
 
 TEST(LevelDB, Fuzz) {
+  rmrf(LEVELDB_LOCATION);
+  
   leveldb::DB* l_db;
   leveldb::Options l_options;
   l_options.create_if_missing = true;
   leveldb::Status l_status = leveldb::DB::Open(l_options, LEVELDB_LOCATION, &l_db);
   ASSERT (l_status.ok()) << "Could not create the leveldb test database!";
-
-#ifdef ROCKS_TOO
-  rocksdb::DB* r_db;
-  rocksdb::Options r_options;
-  r_options.create_if_missing = true;
-  rocksdb::Status r_status = rocksdb::DB::Open(r_options, ROCKSDB_LOCATION, &r_db);
-  ASSERT (r_status.ok()) << "Could not create the rocksdb test database!";
-#endif
-
   leveldb::WriteBatch l_batch;
 
-#ifdef ROCKS_TOO
-  rocksdb::WriteBatch r_batch;
-#endif
-  
   for (int n=0; n < TEST_LENGTH; n++) {
     OneOf(
 	  [&] {
@@ -69,20 +52,6 @@ TEST(LevelDB, Fuzz) {
 	    if (!l_s.ok()) {
 	      LOG(TRACE) << n << ": leveldb NOT OK: " << l_s.ToString();
 	    }
-
-#ifdef ROCKS_TOO
-	    rocksdb::WriteOptions r_write_options;
-	    if (synced) {
-	      r_write_options.sync = true;	    
-	    }
-	    rocksdb::Status r_s = r_db->Put(r_write_options, key, value);
-	    if (!r_s.ok()) {
-	      LOG(TRACE) << n << ": rocksdb NOT OK: " << r_s.ToString();
-	      ASSERT (!l_s.ok()) << "Mismatch:  rocksb not ok, leveldb ok";
-	    } else {
-	      ASSERT (l_s.ok()) << "Mismatch:  rocksdb ok, leveldb not ok";	      
-	    }
-#endif
 	  },
 	  [&] {
 	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
@@ -91,10 +60,6 @@ TEST(LevelDB, Fuzz) {
 	    LOG(TRACE) << n << ": BATCH PUT " << key << " " << value;
 	    
 	    l_batch.Put(key, value);
-
-#ifdef ROCKS_TOO
-	    r_batch.Put(key, value);
-#endif
 	  },	  
 	  [&] {
 	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
@@ -107,19 +72,6 @@ TEST(LevelDB, Fuzz) {
 	    } else {
 	      LOG(TRACE) << n << ": leveldb NOT OK: " << l_s.ToString();
 	    }
-
-#ifdef ROCKS_TOO
-	    std::string r_value;
-	    rocksdb::Status r_s = r_db->Get(rocksdb::ReadOptions(), key, &r_value);
-	    if (r_s.ok()) {
-	      LOG(TRACE) << n << ": RESULT:" << r_value;
-	      ASSERT (r_s.ok()) << "Mismatch:  rocksb ok, leveldb not ok";
-	      ASSERT_EQ (l_value, r_value) << l_value << " SHOULD EQUAL " << r_value;
-	    } else {
-	      LOG(TRACE) << n << ": rocksdb NOT OK: " << l_s.ToString();
-	      ASSERT (!l_s.ok()) << "Mismatch:  rocksb not ok, leveldb ok";
-	    }
-#endif
 	  },
 	  [&] {
 	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
@@ -134,29 +86,12 @@ TEST(LevelDB, Fuzz) {
 	    if (!l_s.ok()) {
 	      LOG(TRACE) << n << ": leveldb NOT OK: " << l_s.ToString();
 	    }
-#ifdef ROCKS_TOO
-	    rocksdb::WriteOptions r_write_options;
-	    if (synced) {
-	      r_write_options.sync = true;	    
-	    }	    
-	    rocksdb::Status r_s = r_db->Delete(r_write_options, key);
-	    if (!r_s.ok()) {
-	      LOG(TRACE) << n << ": rocksdb NOT OK: " << r_s.ToString();
-	      ASSERT (!l_s.ok()) << "Mismatch:  rocksb not ok, leveldb ok";
-	    } else {
-	      ASSERT (l_s.ok()) << "Mismatch:  rocksdb ok, leveldb not ok";	      
-	    }
-#endif
 	  },
 	  [&] {
 	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
 	    LOG(TRACE) << n << ": BATCH DELETE " << key;
 	    
 	    l_batch.Delete(key);
-
-#ifdef ROCKS_TOO
-	    r_batch.Delete(key);
-#endif
 	  },	  
 	  [&] {
 	    LOG(TRACE) << n << ": BATCH WRITE";
@@ -165,34 +100,14 @@ TEST(LevelDB, Fuzz) {
 	    if (!l_s.ok()) {
 	      LOG(TRACE) << n << ": leveldb NOT OK: " << l_s.ToString();
 	    }
-
-#ifdef ROCKS_TOO
-	    rocksdb::Status r_s = r_db->Write(rocksdb::WriteOptions(), &r_batch);
-	    if (!r_s.ok()) {
-	      LOG(TRACE) << n << ": rocksdb NOT OK: " << r_s.ToString();
-	      ASSERT (!l_s.ok()) << "Mismatch:  rocksb not ok, leveldb ok";
-	    } else {
-	      ASSERT (l_s.ok()) << "Mismatch:  rocksdb ok, leveldb not ok";	      
-	    }
-#endif
 	  },
 	  [&] {
 	    LOG(TRACE) << n << ": BATCH CLEAR";
 	    
 	    l_batch.Clear();
-
-#ifdef ROCKS_TOO
-	    r_batch.Clear();
-#endif
 	  }
 	  );
   }
   
   delete l_db;
-  rmrf(LEVELDB_LOCATION);
-
-#ifdef ROCKS_TOO
-  delete r_db;
-  rmrf(ROCKSDB_LOCATION);
-#endif
 }
