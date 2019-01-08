@@ -25,7 +25,7 @@ int rmrf(const char *path) {
 void check_status(int n, leveldb::Status l_s, rocksdb::Status r_s) {
   LOG(TRACE) << n << ": leveldb STATUS: " << l_s.ToString();
   LOG(TRACE) << n << ": rocksdb STATUS: " << r_s.ToString();
-  ASSERT ((l.ok() && r.ok()) || ((!l.ok()) && (!r.ok()))) << "Status mismatch: " << l_s.ToString() <<
+  ASSERT ((l_s.ok() && r_s.ok()) || ((!l_s.ok()) && (!r_s.ok()))) << "Status mismatch: " << l_s.ToString() <<
     " vs. " << r_s.ToString();
 }
 
