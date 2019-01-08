@@ -1,6 +1,8 @@
+Differential fuzzing for leveldb and rocksdb.
+
 1.  install [DeepState](https://github.com/trailofbits/deepstate)
 
-2.  install leveldb, after editing its CMakeLists.txt to add-fsanitize=integer,undefined,address,fuzzer-no-link
+2.  install leveldb, after editing its CMakeLists.txt to add -fsanitize=integer,undefined,address,fuzzer-no-link
 
 editing the CMakeLists.txt thus:
 
@@ -16,6 +18,35 @@ editing the CMakeLists.txt thus:
  ```
  may work
 
-3.  edit Makefile to point to good clang and to leveldb
+Make sure to use a clang >= 6.0 to compile!
 
-3.  fuzz
+3. install rocksdb, after editing its Makefile to add
+-fsanitize=integer,undefined,address,fuzzer-no-link:
+
+```
+@@ -232,6 +232,11 @@ ifneq ($(filter -DROCKSDB_LITE,$(OPT)),)
+        LUA_PATH =
+ endif
+ 
++DISABLE_JEMALLOC=1
++EXEC_LDFLAGS += -fsanitize=address,integer,undefined,fuzzer-no-link
++PLATFORM_CCFLAGS += -fsanitize=address,integer,undefined,fuzzer-no-link
++PLATFORM_CXXFLAGS += -fsanitize=address,integer,undefined,fuzzer-no-link
++
+ # ASAN doesn't work well with jemalloc. If we're compiling with ASAN, we should use regular malloc.
+ ifdef COMPILE_WITH_ASAN
+        DISABLE_JEMALLOC=1
+```
+
+Make sure to use a clang >= 6.0 to compile!
+
+3.  edit this repo's Makefile to point to a >= 6.0 clang, to leveldb,
+and to rocksdb.  edit `TestLevelDB.cpp` with locations for the respective databases.
+
+Using a ramdisk for the databases is *STRONGLY* recommended, unless
+you want to both fuzz slowly and burn out your SSD.
+
+3.  `make`
+
+`TestBoth` and `TestBoth_LF` are the primary fuzzers.  `TestLevelDB`
+just runs leveldb, without differential testing with RocksDB.
