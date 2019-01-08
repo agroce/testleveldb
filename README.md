@@ -48,5 +48,5 @@ you want to both fuzz slowly and burn out your SSD.
 
 5.  `make`
 
-`TestBoth` and `TestBoth_LF` are the primary fuzzers.  `TestLevelDB`
+`DiffTestDBs` and `DiffTestDBs_LF` are the primary fuzzers.  `TestLevelDB`
 just runs leveldb, without differential testing with RocksDB.
