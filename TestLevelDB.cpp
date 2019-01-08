@@ -72,12 +72,12 @@ TEST(LevelDB, Fuzz) {
 	    if (synced) {
 	      r_write_options.sync = true;	    
 	    }
-	    rocksdb::Status r_s = r_db->Put(l_write_options, key, value);
+	    rocksdb::Status r_s = r_db->Put(r_write_options, key, value);
 	    if (!r_s.ok()) {
 	      LOG(TRACE) << n << ": rocksdb NOT OK: " << r_s.ToString();
 	      ASSERT (!l_s.ok()) << "Mismatch:  rocksb not ok, leveldb ok";
 	    } else {
-	      ASSERT (l_sok()) << "Mismatch:  rocksdb ok, leveldb not ok";	      
+	      ASSERT (l_s.ok()) << "Mismatch:  rocksdb ok, leveldb not ok";	      
 	    }
 #endif
 	  },
