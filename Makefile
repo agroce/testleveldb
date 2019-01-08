@@ -7,7 +7,7 @@ ROCKSDB=/Users/alex/rocksdb
 all: TestLevelDB TestLevelDB_LF TestBoth TestBoth_LF
 
 clean:
-	rm TestLevelDB TestLevelDB_LF
+	rm TestLevelDB TestLevelDB_LF TestBoth TestBoth_LF
 
 TestLevelDB: TestLevelDB.cpp
 	$(CXX) -o TestLevelDB TestLevelDB.cpp -I$(LEVELDB)/include $(LEVELDB)/build/libleveldb.a -fsanitize=undefined,address -ldeepstate
