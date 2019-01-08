@@ -98,8 +98,8 @@ TEST(LevelDB, Fuzz) {
 	    rocksdb::Status r_s = r_db->Get(rocksdb::ReadOptions(), key, &r_value);
 
 	    check_status(n, l_s, r_s);
-	    if (l.ok()) {
-	      LOG_TRACE(n << ": RESULT: " << l_value);
+	    if (l_s.ok()) {
+	      LOG(TRACE) << n << ": RESULT: " << l_value);
 	    }
 	    ASSERT_EQ (l_value, r_value) << l_value << " SHOULD EQUAL " << r_value;
 	  },
