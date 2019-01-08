@@ -40,13 +40,13 @@ Make sure to use a clang >= 6.0 to compile!
 
 Make sure to use a clang >= 6.0 to compile!
 
-3.  edit this repo's Makefile to point to a >= 6.0 clang, to leveldb,
+4.  edit this repo's Makefile to point to a >= 6.0 clang, to leveldb,
 and to rocksdb.  edit `TestLevelDB.cpp` with locations for the respective databases.
 
 Using a ramdisk for the databases is *STRONGLY* recommended, unless
 you want to both fuzz slowly and burn out your SSD.
 
-3.  `make`
+5.  `make`
 
 `TestBoth` and `TestBoth_LF` are the primary fuzzers.  `TestLevelDB`
 just runs leveldb, without differential testing with RocksDB.
