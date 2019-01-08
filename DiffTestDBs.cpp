@@ -31,6 +31,9 @@ int rmrf(const char *path) {
 #define MAX_VALUE_LENGTH 128
 
 TEST(LevelDB, Fuzz) {
+  rmrf(LEVELDB_LOCATION);
+  rmrf(ROCKSDB_LOCATION);
+  
   leveldb::DB* l_db;
   leveldb::Options l_options;
   l_options.create_if_missing = true;
@@ -166,7 +169,5 @@ TEST(LevelDB, Fuzz) {
   }
   
   delete l_db;
-  rmrf(LEVELDB_LOCATION);
   delete r_db;
-  rmrf(ROCKSDB_LOCATION);
 }
