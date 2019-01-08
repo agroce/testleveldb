@@ -25,10 +25,10 @@ int rmrf(const char *path) {
 #define LEVELDB_LOCATION "/mnt/ramdisk/testleveldb"
 #define ROCKSDB_LOCATION "/mnt/ramdisk/testrocksdb"
 
-#define TEST_LENGTH 20
+#define TEST_LENGTH 50
 
-#define MAX_KEY_LENGTH 64
-#define MAX_VALUE_LENGTH 64
+#define MAX_KEY_LENGTH 32
+#define MAX_VALUE_LENGTH 128
 
 TEST(LevelDB, Fuzz) {
   leveldb::DB* l_db;
