@@ -99,7 +99,7 @@ TEST(LevelDB, Fuzz) {
 
 	    check_status(n, l_s, r_s);
 	    if (l_s.ok()) {
-	      LOG(TRACE) << n << ": RESULT: " << l_value);
+	      LOG(TRACE) << n << ": RESULT: " << l_value;
 	    }
 	    ASSERT_EQ (l_value, r_value) << l_value << " SHOULD EQUAL " << r_value;
 	  },
