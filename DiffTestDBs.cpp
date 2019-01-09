@@ -70,11 +70,7 @@ TEST(LevelDB, Fuzz) {
   rocksdb::Options r_options;
   r_options.create_if_missing = true;
 
-  if (DeepState_Bool()) {
-    unsigned int bits_per_key = DeepState_UIntInRange(1,20);
-    LOG(TRACE) << "rocksdb: USING BLOOM FILTERS WITH " << bits_per_key << " BITS PER KEY";
-    r_options.filter_policy = rocksdb::NewBloomFilterPolicy(bits_per_key);
-  }
+  r_options.
   
   rocksdb::Status r_s = rocksdb::DB::Open(r_options, ROCKSDB_LOCATION, &r_db);
   ASSERT(r_s.ok()) << "Could not create the rocksdb test database!";
@@ -237,7 +233,19 @@ TEST(LevelDB, Fuzz) {
 	      r_it->Prev();
 	      check_it_valid(l_it, r_it);
 	    }
-	  }
+	  },
+	  [&] {
+	    unsigned int write_buffer_size = DeepState_UIntInRange(128, 64 * 1024 * 2048);
+	    LOG(TRACE) << n << ": SET ROCKSDB write_buffer_size" << write_buffer_size;
+	    rocksdb::Status r_s = db->SetOptions({{"write_buffer_size", std::to_string(write_buffer_size)}});
+	    ASSERT(r_s.ok()) << "Failed to set write buffer size!";
+	  },
+	  [&] {
+	    unsigned int max_write_buffer_number = DeepState_UIntInRange(2, 10);
+	    LOG(TRACE) << n << ": SET ROCKSDB max_write_buffer_number" << max_write_buffer_number;
+	    rocksdb::Status r_s = db->SetOptions({{"max_write_buffer_number", std::to_string(max_write_buffer_number)}});
+	    ASSERT(r_s.ok()) << "Failed to set max write buffer number!";
+	  }	  
 	  );
   }
 
