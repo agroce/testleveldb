@@ -213,6 +213,14 @@ TEST(LevelDB, Fuzz) {
 	  }
 	  );
   }
+
+  if (l_it != nullptr) {
+    delete l_it;
+  }
+
+  if (l_it != nullptr) {
+    delete r_it;
+  }
   
   delete l_db;
   delete r_db;
