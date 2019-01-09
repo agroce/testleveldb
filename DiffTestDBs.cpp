@@ -31,7 +31,8 @@ void check_status(int n, leveldb::Status l_s, rocksdb::Status r_s) {
 
 bool check_it_valid(leveldb::Iterator *l_it, rocksdb::Iterator *r_it) {
   if ((l_it == nullptr) || (r_it == nullptr)) {
-    ASSERT ((l_it == r_it)) << "Mismatch in iterator null: " << l_it << " vs. " << r_it;
+    ASSERT_EQ (l_it == nullptr, r_it == nullptr)) << "Mismatch in iterator null: " <<
+						       l_it << " vs. " << r_it;
     return false;
   }
   if ((!l_it->Valid()) || (!r_it->Valid())) {
@@ -39,8 +40,8 @@ bool check_it_valid(leveldb::Iterator *l_it, rocksdb::Iterator *r_it) {
       l_it->Valid() << " vs. " << r_it->Valid();
     return false;
   }
-  leveldb::Status l_ok = l_it->status();
-  rocksdb::Status r_ok = r_it->status();  
+  leveldb::Status l_s = l_it->status();
+  rocksdb::Status r_s = r_it->status();  
   ASSERT ((l_s.ok() && r_s.ok()) || ((!l_s.ok()) && (!r_s.ok()))) <<
     "Iterator status mismatch: " << l_s.ToString() << " vs. " << r_s.ToString();  
   return true;
@@ -191,10 +192,10 @@ TEST(LevelDB, Fuzz) {
 	    LOG(TRACE) << n << ": ITERATOR GET";
 
 	    if (check_it_valid(l_it, r_it)) {
-	      std::string l_key = l_it->Key();
-	      std::string r_key = r_it->Key();
-	      std::string l_value = l_it->Value();
-	      std::string r_value = r_it->Value();
+	      std::string l_key = l_it->key();
+	      std::string r_key = r_it->key();
+	      std::string l_value = l_it->value();
+	      std::string r_value = r_it->value();
 	      ASSERT_EQ (l_key, r_key) << "Mismatch in keys:" <<
 		l_key << " vs. " << r_key;
 	      ASSERT_EQ (l_key, r_key) << "Mismatch in values:" <<
