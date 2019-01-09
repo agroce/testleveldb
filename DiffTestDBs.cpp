@@ -190,16 +190,6 @@ TEST(LevelDB, Fuzz) {
 	  },
 	  [&] {
 	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);	    
-	    LOG(TRACE) << n << "ITERATOR SEEKFORPREV <" << key << ">";
-
-	    if (check_it_valid(l_it, r_it)) {
-	      l_it->SeekForPrev(key);
-	      r_it->SeekForPrev(key);
-	      check_it_valid(l_it, r_it);
-	    }
-	  },
-	  [&] {
-	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);	    
 	    LOG(TRACE) << n << "ITERATOR SEEKTOLAST";
 
 	    if (check_it_valid(l_it, r_it)) {
