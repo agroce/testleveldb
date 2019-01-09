@@ -2,6 +2,7 @@
 #include "leveldb/write_batch.h"
 
 #include "rocksdb/db.h"
+#include "rocksdb/filter_policy.h"
 #include "rocksdb/options.h"
 #include "rocksdb/write_batch.h"
 
@@ -68,6 +69,13 @@ TEST(LevelDB, Fuzz) {
   rocksdb::DB* r_db;
   rocksdb::Options r_options;
   r_options.create_if_missing = true;
+
+  if (DeepState_Bool()) {
+    unsigned int bits_per_key = DeepState_UIntInRange(1,20);
+    LOG(TRACE) << "rocksdb: USING BLOOM FILTERS WITH " << bits_per_key << " BITS PER KEY";
+    r_options.filter_policy = rocksdb::NewBloomFilterPolicy(bits_per_key);
+  }
+  
   rocksdb::Status r_s = rocksdb::DB::Open(r_options, ROCKSDB_LOCATION, &r_db);
   ASSERT(r_s.ok()) << "Could not create the rocksdb test database!";
 
@@ -229,11 +237,6 @@ TEST(LevelDB, Fuzz) {
 	      r_it->Prev();
 	      check_it_valid(l_it, r_it);
 	    }
-	  },
-	  [&] {
-	    unsigned int bits_per_key = DeepState_UIntInRange(1,20);
-	    LOG(TRACE) << n << ": TURN ON BLOOM FILTERS WITH " << bits_per_key << " BITS PER KEY"
-	    r_options.filter_policy = rocksdb::NewBloomFilterPolicy(bits_per_key)
 	  }
 	  );
   }
