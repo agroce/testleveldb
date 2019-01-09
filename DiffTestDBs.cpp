@@ -229,6 +229,11 @@ TEST(LevelDB, Fuzz) {
 	      r_it->Prev();
 	      check_it_valid(l_it, r_it);
 	    }
+	  },
+	  [&] {
+	    unsigned int bits_per_key = DeepState_UIntInRange(1,20);
+	    LOG(TRACE) << n << ": TURN ON BLOOM FILTERS WITH " << bits_per_key << " BITS PER KEY"
+	    r_options.filter_policy = rocksdb::NewBloomFilterPolicy(bits_per_key)
 	  }
 	  );
   }
