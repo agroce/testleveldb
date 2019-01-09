@@ -25,24 +25,24 @@ int rmrf(const char *path) {
 void check_status(int n, leveldb::Status l_s, rocksdb::Status r_s) {
   LOG(TRACE) << n << ": leveldb STATUS: " << l_s.ToString();
   LOG(TRACE) << n << ": rocksdb STATUS: " << r_s.ToString();
-  ASSERT ((l_s.ok() && r_s.ok()) || ((!l_s.ok()) && (!r_s.ok()))) << "Status mismatch: " <<
+  ASSERT((l_s.ok() && r_s.ok()) || ((!l_s.ok()) && (!r_s.ok()))) << "Status mismatch: " <<
     l_s.ToString() << " vs. " << r_s.ToString();
 }
 
 bool check_it_valid(leveldb::Iterator *l_it, rocksdb::Iterator *r_it) {
   if ((l_it == nullptr) || (r_it == nullptr)) {
-    ASSERT_EQ (l_it == nullptr, r_it == nullptr)) << "Mismatch in iterator null: " <<
-						       l_it << " vs. " << r_it;
+    ASSERT_EQ(l_it == nullptr, r_it == nullptr) << "Mismatch in iterator null: " <<
+      l_it << " vs. " << r_it;
     return false;
   }
   if ((!l_it->Valid()) || (!r_it->Valid())) {
-    ASSERT ((l_it->Valid() == r_it->Valid())) << "Mismatch in iterator validity: " <<
+    ASSERT((l_it->Valid() == r_it->Valid())) << "Mismatch in iterator validity: " <<
       l_it->Valid() << " vs. " << r_it->Valid();
     return false;
   }
   leveldb::Status l_s = l_it->status();
   rocksdb::Status r_s = r_it->status();  
-  ASSERT ((l_s.ok() && r_s.ok()) || ((!l_s.ok()) && (!r_s.ok()))) <<
+  ASSERT((l_s.ok() && r_s.ok()) || ((!l_s.ok()) && (!r_s.ok()))) <<
     "Iterator status mismatch: " << l_s.ToString() << " vs. " << r_s.ToString();  
   return true;
 }
@@ -63,13 +63,13 @@ TEST(LevelDB, Fuzz) {
   leveldb::Options l_options;
   l_options.create_if_missing = true;
   leveldb::Status l_s = leveldb::DB::Open(l_options, LEVELDB_LOCATION, &l_db);
-  ASSERT (l_s.ok()) << "Could not create the leveldb test database!";
+  ASSERT(l_s.ok()) << "Could not create the leveldb test database!";
 
   rocksdb::DB* r_db;
   rocksdb::Options r_options;
   r_options.create_if_missing = true;
   rocksdb::Status r_s = rocksdb::DB::Open(r_options, ROCKSDB_LOCATION, &r_db);
-  ASSERT (r_s.ok()) << "Could not create the rocksdb test database!";
+  ASSERT(r_s.ok()) << "Could not create the rocksdb test database!";
 
   leveldb::WriteBatch l_batch;
   rocksdb::WriteBatch r_batch;
@@ -119,7 +119,7 @@ TEST(LevelDB, Fuzz) {
 	    if (l_s.ok()) {
 	      LOG(TRACE) << n << ": RESULT: <" << l_value << ">";
 	    }
-	    ASSERT_EQ (l_value, r_value) << l_value << " SHOULD EQUAL " << r_value;
+	    ASSERT_EQ(l_value, r_value) << l_value << " SHOULD EQUAL " << r_value;
 	  },
 	  [&] {
 	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
@@ -192,13 +192,13 @@ TEST(LevelDB, Fuzz) {
 	    LOG(TRACE) << n << ": ITERATOR GET";
 
 	    if (check_it_valid(l_it, r_it)) {
-	      std::string l_key = l_it->key();
-	      std::string r_key = r_it->key();
-	      std::string l_value = l_it->value();
-	      std::string r_value = r_it->value();
-	      ASSERT_EQ (l_key, r_key) << "Mismatch in keys:" <<
+	      std::string l_key = l_it->key().ToString();
+	      std::string r_key = r_it->key().ToString();
+	      std::string l_value = l_it->value().ToString();
+	      std::string r_value = r_it->value().ToString();
+	      ASSERT_EQ(l_key, r_key) << "Mismatch in keys:" <<
 		l_key << " vs. " << r_key;
-	      ASSERT_EQ (l_key, r_key) << "Mismatch in values:" <<
+	      ASSERT_EQ(l_key, r_key) << "Mismatch in values:" <<
 		l_value << " vs. " << r_value;
 	    }
 	  },
