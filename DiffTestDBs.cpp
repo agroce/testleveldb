@@ -12,6 +12,17 @@
 
 using namespace deepstate;
 
+#define LEVELDB_LOCATION "/mnt/ramdisk/testleveldb"
+#define ROCKSDB_LOCATION "/mnt/ramdisk/testrocksdb"
+
+#define TEST_LENGTH 50
+
+#define MAX_KEY_LENGTH 32
+#define MAX_VALUE_LENGTH 128
+
+// define as 0 for arbitrary bytestrings
+#define ALPHABET "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+
 int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf) {
   int rv = remove(fpath);
   if (rv)
@@ -48,13 +59,13 @@ bool check_it_valid(leveldb::Iterator *l_it, rocksdb::Iterator *r_it) {
   return true;
 }
 
-#define LEVELDB_LOCATION "/mnt/ramdisk/testleveldb"
-#define ROCKSDB_LOCATION "/mnt/ramdisk/testrocksdb"
+char* GetKey() {
+  return DeepState_CStrUpToLen(MAX_KEY_LENGTH, ALPHABET);
+}
 
-#define TEST_LENGTH 50
-
-#define MAX_KEY_LENGTH 32
-#define MAX_VALUE_LENGTH 128
+char* GetValue() {
+  return DeepState_CStrUpToLen(MAX_VALUE_LENGTH, ALPHABET);
+}
 
 TEST(LevelDB, Fuzz) {
   rmrf(LEVELDB_LOCATION);
@@ -81,8 +92,8 @@ TEST(LevelDB, Fuzz) {
   for (int n=0; n < TEST_LENGTH; n++) {
     OneOf(
 	  [&] {
-	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
-	    char* value = DeepState_CStrUpToLen(MAX_VALUE_LENGTH);
+	    char* key = GetKey();
+	    char* value = GetValue();
 	    bool synced = DeepState_Bool();
 	    LOG(TRACE) << n << ": PUT <" << key << "> <" << value << "> " << synced;
 
@@ -98,8 +109,8 @@ TEST(LevelDB, Fuzz) {
 	    check_status(n, l_s, r_s);
 	  },
 	  [&] {
-	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
-	    char* value = DeepState_CStrUpToLen(MAX_VALUE_LENGTH);
+	    char* key = GetKey();
+	    char* value = GetValue();
 
 	    LOG(TRACE) << n << ": BATCH PUT <" << key << "> <" << value << ">";
 	    
@@ -107,7 +118,7 @@ TEST(LevelDB, Fuzz) {
 	    r_batch.Put(key, value);
 	  },	  
 	  [&] {
-	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
+	    char* key = GetKey();
 	    LOG(TRACE) << n << ": GET <" << key << ">";
 
 	    std::string l_value;
@@ -123,7 +134,7 @@ TEST(LevelDB, Fuzz) {
 	    ASSERT_EQ(l_value, r_value) << l_value << " SHOULD EQUAL " << r_value;
 	  },
 	  [&] {
-	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
+	    char* key = GetKey();
 	    bool synced = DeepState_Bool();
 	    LOG(TRACE) << n << ": DELETE <" << key << "> " << synced;
 
@@ -140,7 +151,7 @@ TEST(LevelDB, Fuzz) {
 	    check_status(n, l_s, r_s);
 	  },
 	  [&] {
-	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);
+	    char* key = GetKey();
 	    LOG(TRACE) << n << ": BATCH DELETE <" << key << ">";
 	    
 	    l_batch.Delete(key);
@@ -180,7 +191,7 @@ TEST(LevelDB, Fuzz) {
 	    r_it = r_db->NewIterator(rocksdb::ReadOptions());
 	  },
 	  [&] {
-	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);	    
+	    char* key = GetKey();
 	    LOG(TRACE) << n << ": ITERATOR SEEK <" << key << ">";
 
 	    if (check_it_valid(l_it, r_it)) {
@@ -190,7 +201,7 @@ TEST(LevelDB, Fuzz) {
 	    }
 	  },
 	  [&] {
-	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);	    
+	    char* key = GetKey();
 	    LOG(TRACE) << n << ": ITERATOR SEEKTOLAST";
 
 	    if (check_it_valid(l_it, r_it)) {
