@@ -31,7 +31,7 @@ void check_status(int n, leveldb::Status l_s, rocksdb::Status r_s) {
 
 bool check_it_valid(leveldb::Iterator *l_it, rocksdb::Iterator *r_it) {
   if ((l_it == nullptr) || (r_it == nullptr)) {
-    ASSERT_EQ(l_it == nullptr, r_it == nullptr) << "Mismatch in iterator null: " <<
+    ASSERT((l_it == nullptr) == (r_it == nullptr)) << "Mismatch in iterator null: " <<
       l_it << " vs. " << r_it;
     return false;
   }
