@@ -69,9 +69,6 @@ TEST(LevelDB, Fuzz) {
   rocksdb::DB* r_db;
   rocksdb::Options r_options;
   r_options.create_if_missing = true;
-
-  r_options.
-  
   rocksdb::Status r_s = rocksdb::DB::Open(r_options, ROCKSDB_LOCATION, &r_db);
   ASSERT(r_s.ok()) << "Could not create the rocksdb test database!";
 
