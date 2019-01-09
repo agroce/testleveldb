@@ -1,8 +1,8 @@
 CC=clang
 CXX=clang++
 
-LEVELDB=~/leveldb
-ROCKSDB=~/rocksdb
+LEVELDB=/root/leveldb
+ROCKSDB=/root/rocksdb
 
 all: DiffTestDBs DiffTestDBs_LF
 
@@ -16,7 +16,7 @@ TestLevelDB_LF: TestLevelDB.cpp
 	$(CXX) -o TestLevelDB_LF TestLevelDB.cpp -I$(LEVELDB)/include $(LEVELDB)/build/libleveldb.a -fsanitize=fuzzer,undefined,address -ldeepstate_LF
 
 DiffTestDBs: DiffTestDBs.cpp
-	$(CXX) -o TestBoth DiffTestDBs.cpp -I$(LEVELDB)/include $(LEVELDB)/build/libleveldb.a -I$(ROCKSDB)/include $(ROCKSDB)/librocksdb.a -fsanitize=undefined,address -ldeepstate
+	$(CXX) -o DiffTestDBs DiffTestDBs.cpp -I$(LEVELDB)/include $(LEVELDB)/build/libleveldb.a -I$(ROCKSDB)/include $(ROCKSDB)/librocksdb.a -fsanitize=undefined,address -ldeepstate
 
 DiffTestDBs_LF: DiffTestDBs.cpp
 	$(CXX) -o DiffTestDBs_LF DiffTestDBs.cpp -I$(LEVELDB)/include $(LEVELDB)/build/libleveldb.a -I$(ROCKSDB)/include $(ROCKSDB)/librocksdb.a -fsanitize=fuzzer,undefined,address -ldeepstate_LF
