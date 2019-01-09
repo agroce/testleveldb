@@ -148,7 +148,7 @@ TEST(LevelDB, Fuzz) {
 	  },	  
 	  [&] {
 	    bool synced = DeepState_Bool();	    
-	    LOG(TRACE) << n << ": BATCH WRITE" << synced;
+	    LOG(TRACE) << n << ": BATCH WRITE " << synced;
 
 	    leveldb::WriteOptions l_write_options;
 	    rocksdb::WriteOptions r_write_options;
@@ -181,7 +181,7 @@ TEST(LevelDB, Fuzz) {
 	  },
 	  [&] {
 	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);	    
-	    LOG(TRACE) << n << "ITERATOR SEEK <" << key << ">";
+	    LOG(TRACE) << n << ": ITERATOR SEEK <" << key << ">";
 
 	    if (check_it_valid(l_it, r_it)) {
 	      l_it->Seek(key);
@@ -191,7 +191,7 @@ TEST(LevelDB, Fuzz) {
 	  },
 	  [&] {
 	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);	    
-	    LOG(TRACE) << n << "ITERATOR SEEKTOLAST";
+	    LOG(TRACE) << n << ": ITERATOR SEEKTOLAST";
 
 	    if (check_it_valid(l_it, r_it)) {
 	      l_it->SeekToLast();
