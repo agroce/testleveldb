@@ -189,6 +189,26 @@ TEST(LevelDB, Fuzz) {
 	    }
 	  },
 	  [&] {
+	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);	    
+	    LOG(TRACE) << n << "ITERATOR SEEKPREV <" << key << ">";
+
+	    if (check_it_valid(l_it, r_it)) {
+	      l_it->SeekPrev(key);
+	      r_it->SeekPrev(key);
+	      check_it_valid(l_it, r_it);
+	    }
+	  },
+	  [&] {
+	    char* key = DeepState_CStrUpToLen(MAX_KEY_LENGTH);	    
+	    LOG(TRACE) << n << "ITERATOR SEEKTOLAST";
+
+	    if (check_it_valid(l_it, r_it)) {
+	      l_it->SeekToLast();
+	      r_it->SeekToLast();
+	      check_it_valid(l_it, r_it);
+	    }
+	  },
+	  [&] {
 	    LOG(TRACE) << n << ": ITERATOR GET";
 
 	    if (check_it_valid(l_it, r_it)) {
@@ -208,6 +228,15 @@ TEST(LevelDB, Fuzz) {
 	    if (check_it_valid(l_it, r_it)) {
 	      l_it->Next();
 	      r_it->Next();
+	      check_it_valid(l_it, r_it);
+	    }
+	  },
+	  [&] {
+	    LOG(TRACE) << n << ": ITERATOR PREV";
+
+	    if (check_it_valid(l_it, r_it)) {
+	      l_it->Prev();
+	      r_it->Prev();
 	      check_it_valid(l_it, r_it);
 	    }
 	  }
