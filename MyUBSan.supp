@@ -9,5 +9,6 @@ unsigned-integer-overflow:db/memtable_list.cc
 unsigned-integer-overflow:db/flush_job.cc
 unsigned-integer-overflow:db/internal_stats.h
 unsigned-integer-overflow:util/stop_watch.h
+unsigned-integer-overflow:db/compaction_job.cc
 alignment:util/crc32c.cc
 alignment:util/coding.h
