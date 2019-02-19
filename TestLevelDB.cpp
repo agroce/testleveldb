@@ -28,8 +28,8 @@ int rmrf(const char *path) {
   return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
 }
 
-bool it_valid(leveldb::Iterator *l_it) {
-  if ((l_it == nullptr)) {
+bool check_it_valid(leveldb::Iterator *l_it) {
+  if (l_it == nullptr) {
     return false;
   }
   if (!l_it->Valid()) {
@@ -50,6 +50,7 @@ TEST(LevelDB, Fuzz) {
   rmrf(LEVELDB_LOCATION);
   
   leveldb::DB* l_db;
+  leveldb::Iterator *l_it = nullptr;
   leveldb::Options l_options;
   l_options.create_if_missing = true;
   leveldb::Status l_status = leveldb::DB::Open(l_options, LEVELDB_LOCATION, &l_db);
