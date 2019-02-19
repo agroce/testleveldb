@@ -64,7 +64,7 @@ TEST(LevelDB, Fuzz) {
 	    char* key = GetKey();
 	    char* value = GetValue();
 	    bool synced = DeepState_Bool();
-	    LOG(TRACE) << n << ": PUT <" << key << "> <" << value << "> " << synced;
+	    LOG(TRACE) << "STEP #" << n << ": PUT <" << key << "> <" << value << "> " << synced;
 
 	    rocksdb::WriteOptions r_write_options;
 	    leveldb::WriteOptions l_write_options;
@@ -81,14 +81,14 @@ TEST(LevelDB, Fuzz) {
 	    char* key = GetKey();
 	    char* value = GetValue();
 
-	    LOG(TRACE) << n << ": BATCH PUT <" << key << "> <" << value << ">";
+	    LOG(TRACE) << "STEP #" << n << ": BATCH PUT <" << key << "> <" << value << ">";
 	    
 	    l_batch.Put(key, value);
 	    r_batch.Put(key, value);
 	  },	  
 	  [&] {
 	    char* key = GetKey();
-	    LOG(TRACE) << n << ": GET <" << key << ">";
+	    LOG(TRACE) << "STEP #" << n << ": GET <" << key << ">";
 
 	    std::string l_value;
 	    std::string r_value;
@@ -105,7 +105,7 @@ TEST(LevelDB, Fuzz) {
 	  [&] {
 	    char* key = GetKey();
 	    bool synced = DeepState_Bool();
-	    LOG(TRACE) << n << ": DELETE <" << key << "> " << synced;
+	    LOG(TRACE) << "STEP #" << n << ": DELETE <" << key << "> " << synced;
 
 	    leveldb::WriteOptions l_write_options;
 	    rocksdb::WriteOptions r_write_options;
@@ -121,14 +121,14 @@ TEST(LevelDB, Fuzz) {
 	  },
 	  [&] {
 	    char* key = GetKey();
-	    LOG(TRACE) << n << ": BATCH DELETE <" << key << ">";
+	    LOG(TRACE) << "STEP #" << n << ": BATCH DELETE <" << key << ">";
 	    
 	    l_batch.Delete(key);
 	    r_batch.Delete(key);
 	  },	  
 	  [&] {
 	    bool synced = DeepState_Bool();	    
-	    LOG(TRACE) << n << ": BATCH WRITE " << synced;
+	    LOG(TRACE) << "STEP #" << n << ": BATCH WRITE " << synced;
 
 	    leveldb::WriteOptions l_write_options;
 	    rocksdb::WriteOptions r_write_options;
@@ -143,13 +143,13 @@ TEST(LevelDB, Fuzz) {
 	    check_status(n, l_s, r_s);
 	  },
 	  [&] {
-	    LOG(TRACE) << n << ": BATCH CLEAR";
+	    LOG(TRACE) << "STEP #" << n << ": BATCH CLEAR";
 	    
 	    l_batch.Clear();
 	    r_batch.Clear();
 	  },
 	  [&] {
-	    LOG(TRACE) << n << ": ITERATOR CREATE";
+	    LOG(TRACE) << "STEP #" << n << ": ITERATOR CREATE";
 
 	    if (l_it != nullptr) {
 	      delete l_it;
@@ -161,7 +161,7 @@ TEST(LevelDB, Fuzz) {
 	  },
 	  [&] {
 	    char* key = GetKey();
-	    LOG(TRACE) << n << ": ITERATOR SEEK <" << key << ">";
+	    LOG(TRACE) << "STEP #" << n << ": ITERATOR SEEK <" << key << ">";
 
 	    if (check_it_valid(l_it, r_it)) {
 	      l_it->Seek(key);
@@ -171,7 +171,7 @@ TEST(LevelDB, Fuzz) {
 	  },
 	  [&] {
 	    char* key = GetKey();
-	    LOG(TRACE) << n << ": ITERATOR SEEKTOLAST";
+	    LOG(TRACE) << "STEP #" << n << ": ITERATOR SEEKTOLAST";
 
 	    if (check_it_valid(l_it, r_it)) {
 	      l_it->SeekToLast();
@@ -180,7 +180,7 @@ TEST(LevelDB, Fuzz) {
 	    }
 	  },
 	  [&] {
-	    LOG(TRACE) << n << ": ITERATOR GET";
+	    LOG(TRACE) << "STEP #" << n << ": ITERATOR GET";
 
 	    if (check_it_valid(l_it, r_it)) {
 	      std::string l_key = l_it->key().ToString();
@@ -194,7 +194,7 @@ TEST(LevelDB, Fuzz) {
 	    }
 	  },
 	  [&] {
-	    LOG(TRACE) << n << ": ITERATOR NEXT";
+	    LOG(TRACE) << "STEP #" << n << ": ITERATOR NEXT";
 
 	    if (check_it_valid(l_it, r_it)) {
 	      l_it->Next();
@@ -203,7 +203,7 @@ TEST(LevelDB, Fuzz) {
 	    }
 	  },
 	  [&] {
-	    LOG(TRACE) << n << ": ITERATOR PREV";
+	    LOG(TRACE) << "STEP #" << n << ": ITERATOR PREV";
 
 	    if (check_it_valid(l_it, r_it)) {
 	      l_it->Prev();
@@ -213,13 +213,13 @@ TEST(LevelDB, Fuzz) {
 	  },
 	  [&] {
 	    unsigned int write_buffer_size = DeepState_UIntInRange(128, 64 * 1024 * 2048);
-	    LOG(TRACE) << n << ": SET ROCKSDB write_buffer_size " << write_buffer_size;
+	    LOG(TRACE) << "STEP #" << n << ": SET ROCKSDB write_buffer_size " << write_buffer_size;
 	    rocksdb::Status r_s = r_db->SetOptions({{"write_buffer_size", std::to_string(write_buffer_size)}});
 	    ASSERT(r_s.ok()) << "Failed to set write buffer size!";
 	  },
 	  [&] {
 	    unsigned int max_write_buffer_number = DeepState_UIntInRange(2, 10);
-	    LOG(TRACE) << n << ": SET ROCKSDB max_write_buffer_number " << max_write_buffer_number;
+	    LOG(TRACE) << "STEP #" << n << ": SET ROCKSDB max_write_buffer_number " << max_write_buffer_number;
 	    rocksdb::Status r_s = r_db->SetOptions({{"max_write_buffer_number", std::to_string(max_write_buffer_number)}});
 	    ASSERT(r_s.ok()) << "Failed to set max write buffer number!";
 	  }	  
