@@ -1,6 +1,25 @@
 Differential fuzzing for leveldb and rocksdb.
 
-1.  install [DeepState](https://github.com/trailofbits/deepstate)
+One way to go about things right now (until background threads in
+rocksdb are handled) is to use AFL, fuzz leveldb, then run the tests
+on the two databases together.  This is pretty simple, just
+
+
+1.  install [DeepState](https://github.com/trailofbits/deepstate) 
+
+2.  build both databases using afl-clang as your compiler, to get
+    instrumentation (in fact, for now, you can skip this for RocksDB,
+    just build it)
+
+3. build the fuzzers, and fuzz leveldb like, e.g., this:
+
+```
+~/afl/afl-fuzz -i <sometest> -o <output_dir> -- ./TestLevelDB --input_test_file @@ --exit_on_fail
+```
+
+You can also go for libFuzzer based testing:
+
+1.  install [DeepState](https://github.com/trailofbits/deepstate) with BUILD_LIBFUZZER=TRUE
 
 2.  install leveldb, after editing its CMakeLists.txt to add -fsanitize=integer,undefined,address,fuzzer-no-link
 
@@ -40,8 +59,8 @@ Make sure to use a clang >= 6.0 to compile!
 
 Make sure to use a clang >= 6.0 to compile!
 
-4.  edit this repo's Makefile to point to a >= 6.0 clang, to leveldb,
-and to rocksdb.  edit `TestLevelDB.cpp` with locations for the respective databases.
+4.  edit this repo's Makefile to point to a >= 6.0 clang instead of AFL, to leveldb,
+and to rocksdb
 
 Using a ramdisk for the databases is *STRONGLY* recommended, unless
 you want to both fuzz slowly and burn out your SSD.
