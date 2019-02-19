@@ -6,33 +6,10 @@
 #include "rocksdb/options.h"
 #include "rocksdb/write_batch.h"
 
-#include "ftw.h"
+#include "Common.hpp"
 
 #include <deepstate/DeepState.hpp>
-
 using namespace deepstate;
-
-#define LEVELDB_LOCATION "/mnt/ramdisk/testleveldb"
-#define ROCKSDB_LOCATION "/mnt/ramdisk/testrocksdb"
-
-#define TEST_LENGTH 50
-
-#define MAX_KEY_LENGTH 32
-#define MAX_VALUE_LENGTH 128
-
-// define as 0 for arbitrary bytestrings
-#define ALPHABET "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-
-int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf) {
-  int rv = remove(fpath);
-  if (rv)
-    perror(fpath);
-  return rv;
-}
-
-int rmrf(const char *path) {
-  return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
-}
 
 void check_status(int n, leveldb::Status l_s, rocksdb::Status r_s) {
   LOG(TRACE) << n << ": leveldb STATUS: " << l_s.ToString();
@@ -57,14 +34,6 @@ bool check_it_valid(leveldb::Iterator *l_it, rocksdb::Iterator *r_it) {
   ASSERT((l_s.ok() && r_s.ok()) || ((!l_s.ok()) && (!r_s.ok()))) <<
     "Iterator status mismatch: " << l_s.ToString() << " vs. " << r_s.ToString();  
   return true;
-}
-
-char* GetKey() {
-  return DeepState_CStrUpToLen(MAX_KEY_LENGTH, ALPHABET);
-}
-
-char* GetValue() {
-  return DeepState_CStrUpToLen(MAX_VALUE_LENGTH, ALPHABET);
 }
 
 TEST(LevelDB, Fuzz) {

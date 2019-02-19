@@ -1,32 +1,10 @@
 #include "leveldb/db.h"
 #include "leveldb/write_batch.h"
 
-#include "ftw.h"
+#include "Common.hpp"
 
 #include <deepstate/DeepState.hpp>
-
 using namespace deepstate;
-
-#define LEVELDB_LOCATION "/mnt/ramdisk/testleveldb"
-
-#define TEST_LENGTH 50
-
-#define MAX_KEY_LENGTH 64
-#define MAX_VALUE_LENGTH 64
-
-// define as 0 for arbitrary bytestrings
-#define ALPHABET "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-
-int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf) {
-  int rv = remove(fpath);
-  if (rv)
-    perror(fpath);
-  return rv;
-}
-
-int rmrf(const char *path) {
-  return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
-}
 
 bool check_it_valid(leveldb::Iterator *l_it) {
   if (l_it == nullptr) {
@@ -36,14 +14,6 @@ bool check_it_valid(leveldb::Iterator *l_it) {
     return false;
   }
   return true;
-}
-
-char* GetKey() {
-  return DeepState_CStrUpToLen(MAX_KEY_LENGTH, ALPHABET);
-}
-
-char* GetValue() {
-  return DeepState_CStrUpToLen(MAX_VALUE_LENGTH, ALPHABET);
 }
 
 TEST(LevelDB, Fuzz) {
