@@ -1,6 +1,3 @@
-CC=~/afl/afl-clang
-CXX=~/afl/afl-clang++
-
 LEVELDB=/home/vagrant/leveldb
 ROCKSDB=/home/vagrant/rocksdb
 
