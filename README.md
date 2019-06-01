@@ -5,7 +5,7 @@ rocksdb are handled) is to use AFL, fuzz leveldb, then run the tests
 on the two databases together.  This is pretty simple, just
 
 
-1.  install [DeepState](https://github.com/trailofbits/deepstate) 
+1.  install [DeepState](https://github.com/trailofbits/deepstate).  The easiest way to do this is probably the [DeepState docker](https://github.com/trailofbits/deepstate#DOCKER).
 
 2.  build both databases using afl-clang as your compiler, to get
     instrumentation (in fact, for now, you can skip this for RocksDB,
@@ -59,8 +59,7 @@ Make sure to use a clang >= 6.0 to compile!
 
 Make sure to use a clang >= 6.0 to compile!
 
-4.  edit this repo's Makefile to point to a >= 6.0 clang instead of AFL, to leveldb,
-and to rocksdb
+4.  edit this repo's Makefile to link to `deepstate_LF` or `deepstate_AFL` to build libfuzzer/afl fuzzers.
 
 Using a ramdisk for the databases is *STRONGLY* recommended, unless
 you want to both fuzz slowly and burn out your SSD.
@@ -68,4 +67,4 @@ you want to both fuzz slowly and burn out your SSD.
 5.  `make`
 
 `DiffTestDBs` and `DiffTestDBs_LF` are the primary fuzzers.  `TestLevelDB`
-just runs leveldb, without differential testing with RocksDB.
+just runs leveldb, without differential testing with RocksDB.  Tests from `TestLevelDB` run in `DiffTestDBs`.  If you have trouble building the databases with instrumentation, in fact, you can just build them exactly as you normally would for release, and then use Eclipser to fuzz TestLevelDB.  Unfortunately, some issue currently prevents Eclipser from fuzzing rocksdb.
