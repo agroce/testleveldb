@@ -5,8 +5,8 @@
 #include <deepstate/DeepState.hpp>
 using namespace deepstate;
 
-#define LEVELDB_LOCATION "/mnt/ramdisk/testleveldb"
-#define ROCKSDB_LOCATION "/mnt/ramdisk/testrocksdb"
+#define LEVELDB_LOCATION "testleveldb"
+#define ROCKSDB_LOCATION "testrocksdb"
 
 #define TEST_LENGTH 50
 
