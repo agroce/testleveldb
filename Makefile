@@ -1,5 +1,5 @@
-LEVELDB=deepstate_leveldb
-ROCKSDB=deepstate_rocksdb
+LEVELDB=/root/leveldb
+ROCKSDB=/root/rocksdb
 
 all: TestLevelDB TestLevelDB_LF DiffTestDBs DiffTestDBs_LF
 
