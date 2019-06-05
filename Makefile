@@ -1,5 +1,5 @@
-LEVELDB=/home/vagrant/leveldb
-ROCKSDB=/home/vagrant/rocksdb
+LEVELDB=~/deepstate_leveldb
+ROCKSDB=~/deepstate_rocksdb
 
 all: TestLevelDB TestLevelDB_LF DiffTestDBs DiffTestDBs_LF
 
