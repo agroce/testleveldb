@@ -1,5 +1,5 @@
-LEVELDB=/root/leveldb
-ROCKSDB=/root/rocksdb
+LEVELDB=~/leveldb
+ROCKSDB=~/rocksdb
 
 all: TestLevelDB TestLevelDB_LF DiffTestDBs DiffTestDBs_LF
 
